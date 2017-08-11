@@ -10,7 +10,7 @@ class OOMFormatter(mtick.ScalarFormatter):
     def __init__(self, order=0, fformat="%1.1f", offset=True, mathText=True):
         self.oom = order
         self.fformat = fformat
-        mtick.ScalarFormatter.__init__(self,useOffset=offset,useMathText=mathText)
+        mtick.ScalarFormatter.__init__(self, useOffset=offset, useMathText=mathText)
 
     def _set_orderOfMagnitude(self, nothing):
         self.orderOfMagnitude = self.oom
@@ -23,16 +23,23 @@ class OOMFormatter(mtick.ScalarFormatter):
 
 def parse_psmc_output(psmcInputList, representAsEffectiveSize):
 
+    # TODO: apparently there is some sort of bug because my plots, when compared to Li's psmc_plot.pl plots
+    # do not exactly match when the same data is used, especially when it comes to the population size.
+    #
     allPsmcData = []
     for psmcFiles in psmcInputList:
 
+        lastIteration = ""
         with open(psmcFiles[0], 'r') as psmcFile:
             inBlock = False
             timePoints, lambdaPoints, blockPoints = [], [], []
             estimatedTheta = n0 = 0
 
             for line in psmcFile:
-                if line.split() == ['RD', '25']:  # Last iteration
+                if line.split()[0] == "MM" and line.split()[1].split(":")[0] == "n_iterations":
+                    # We could also iterate through the whole file and get the maximum RD value
+                    lastIteration = line.split()[1].split(":")[1].strip(",")
+                if line.split() == ['RD', lastIteration]:  # Last iteration
                     inBlock = True
                     timePoints, lambdaPoints = [], []
                 if inBlock and line[:2] == "RS":
@@ -49,37 +56,43 @@ def parse_psmc_output(psmcInputList, representAsEffectiveSize):
                     scaledSize = scaledTime = 0
 
                     if representAsEffectiveSize:
-                        scaledTime = [generationTime * 2 * n0 * t for t in timePoints]
-                        scaledSize = [n0 * l for l in lambdaPoints]
+                        scaledTime = [generationTime * 2 * n0 * time_k for time_k in timePoints]
+                        scaledSize = [n0 * lambda_k for lambda_k in lambdaPoints]
                     else:
-                        scaledTime = [t * estimatedTheta / binSize for t in timePoints]  # pairwiseSequenceDivergence
-                        scaledSize = [(l * estimatedTheta / binSize)*1e3 for l in lambdaPoints]  # scaledMutRate
+                        scaledTime = [time_k * estimatedTheta / binSize for time_k in timePoints]  # pairwiseSequenceDivergence
+                        scaledSize = [(lambda_k * estimatedTheta / binSize)*1e3 for lambda_k in lambdaPoints]  # scaledMutRate
 
                     blockPoints.append((scaledTime, scaledSize))
         allPsmcData.append(blockPoints)
 
-    return(allPsmcData)
+    return allPsmcData
 
 
-def plotPsmc(listOfOpt, yAsEffectiveSize, xmin=0, xmax=0, ymin=0, ymax=0):
+def plotPsmc(listOfOpt, yAsEffectiveSize,
+             xmin=0, xmax=0,
+             ymin=0, ymax=0,
+             transparency=0.1, isLogScale=True,
+             savePlotWithName="myPlot"):
 
-    myFigure = pplot.figure()
+    myFigure = pplot.figure(1)
     inFigure = myFigure.add_subplot(111)
 
     myData = parse_psmc_output(listOfOpt, representAsEffectiveSize=yAsEffectiveSize)
 
     for i_sample in range(0, len(myData)):
-        # original psmc
-        inFigure.step(myData[i_sample][0][0],
-                      myData[i_sample][0][1],
-                      color=listOfOpt[i_sample][5],
-                      label=listOfOpt[i_sample][4])
+
         # bootstraped psmc
         for j_bootStrap in range(0, len(myData[i_sample])):
             inFigure.step(myData[i_sample][j_bootStrap][0],
                           myData[i_sample][j_bootStrap][1],
                           color=listOfOpt[i_sample][5],
-                          alpha=0.2)
+                          linewidth=1.0,
+                          alpha=transparency)
+        # original psmc
+        inFigure.step(myData[i_sample][0][0],
+                      myData[i_sample][0][1],
+                      color=listOfOpt[i_sample][5],
+                      label=listOfOpt[i_sample][4])
     inFigure.legend(loc=0)
     myFigure.suptitle("PSMC estimate on real data")
 
@@ -103,10 +116,14 @@ def plotPsmc(listOfOpt, yAsEffectiveSize, xmin=0, xmax=0, ymin=0, ymax=0):
     inFigure.grid(True)
     inFigure.set_xlim(xmin, xmax)
     inFigure.set_ylim(ymin, ymax)
-    inFigure.set_xscale("log")
+    if isLogScale:
+        inFigure.set_xscale("log")
+    else:
+        inFigure.set_xscale("linear")
 
-    myFigure.savefig("./testPlot")
-    return myFigure
+    myFigure.savefig(savePlotWithName)
+    myFigure.clf()  # close/clear fig so that it doesnt keep using resources
+    # pplot.close(1) # can't actually close figure because of current conflict with tkinter GUI
 
 
 def readPsmcOptions(pathToOptionsFile):
@@ -137,17 +154,10 @@ def readPsmcOptions(pathToOptionsFile):
                                     sampleName,
                                     lineColor))
 
-    return(psmcOptions)
-
+    return psmcOptions
 
 # a list of inputs/options to plot the PSMC curve
-psmc_options = readPsmcOptions("./plotPSMC.csv")
+#psmc_options = readPsmcOptions("./plotPSMC.csv")
 
-a = plotPsmc(psmc_options, yAsEffectiveSize=True, xmin=1e3, xmax=1e7, ymin=0, ymax=3.5e6)
-#b = plotPsmc(psmc_options, yAsEffectiveSize=False, xmin=1e-7, xmax=1e-2, ymin=0, ymax=5e0)
-
-#pplot.subplot(1,2,1)
-#pplot.plot(a,b)
-#pplot.show()
-
-#plotPsmc(psmc_options, yAsEffectiveSize=True)
+#a = plotPsmc(psmc_options, yAsEffectiveSize=True, xmin=1e4, xmax=1e8, ymin=0, ymax=2e5, transparency=0.15)
+# b = plotPsmc(psmc_options, yAsEffectiveSize=False, xmin=1e-7, xmax=1e-2, ymin=0, ymax=5e0)

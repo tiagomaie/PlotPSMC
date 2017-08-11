@@ -1,9 +1,12 @@
 #PathToPSMCfile GenerationTime MutationRate BinSize SampleName Color(unnecessary but recomended, a random one will be generated)
-#"./TEST_InitFilt_combineBootstrap1-10.psmc" 11 2.5e-8 100 "Baboon" "red"
-./file_rmdupMOS.bam_BWC_.psmc 10 2.5e-8 100 BWColobus black
+#./papio_file_InitUnfilt_Combined_80BSrounds.psmc 11 0.9e-8 100 "P.papio_unfiltered" "cyan"
+#./papio_file_InitFilt_Combined_80BSrounds.psmc 11 0.9e-8 100 "P.papio_filtered" "orange"
+#"./TEST_InitFilt_combineBootstrap1-10.psmc" 11 0.9e-8 100 "P.papio" "red"
+./file_rmdupMOS.bam_BWC_.psmc 10 0.9e-8 100 BWColobus_Tai black
 #./file_test1_combined.psmc 25 2.5e-8 100 Chimpanzee blue
 #./90French10Altai_sorted.psmc 25 2.5e-8 100 French cyan
 #./Dai_upper.psmc 25 2.5e-8 100 Dai
 #./Yoruba_upper.psmc 25 2.5e-8 100 Yoruba purple
 #./Vi33_25_neanderthal.psmc 25 2.5e-8 100 Neanderthal orange
-./file_rc_CB10_combined.psmc 10 2.5e-8 100 RedColobus red
+./file_rc_CB10_combined.psmc 10 0.9e-8 100 RedColobus_CI red
+./file_T29_RC_GB_combined.psmc 10 0.9e-8 100 RedColobus_GB green
