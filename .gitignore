@@ -1,0 +1,7 @@
+/build/
+/dist/
+*.psmc
+*.gif
+*.png
+*.jpeg
+*.jpg
