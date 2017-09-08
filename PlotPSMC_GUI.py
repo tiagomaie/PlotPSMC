@@ -3,6 +3,7 @@ from tkinter import messagebox, ttk
 from PIL import Image, ImageTk
 import PlotPSMC
 import traceback
+from pathlib import Path
 
 
 class PlotPSMCApp(tkinter.Tk):
@@ -88,10 +89,21 @@ class PlotPSMCApp(tkinter.Tk):
         self.plotButton = tkinter.Button(self, text="Plot PSMC", command=self.on_button_plot, bg=plottingOptionsColor)
 
         self.isLogScaleLabel = tkinter.Label(self, text="Plot in log scale?", bg=plottingOptionsColor)
-        self.isLogScale = tkinter.BooleanVar()
-        self.isLogScaleCheckButton = tkinter.Checkbutton(self, variable=self.isLogScale,
-                                                         onvalue=True, offvalue=False)
-        self.isLogScaleCheckButton.select()
+        self.isXLogScale = tkinter.BooleanVar()
+        self.isXLogScaleCheckButton = tkinter.Checkbutton(self, variable=self.isXLogScale,
+                                                          onvalue=True, offvalue=False,
+                                                          text="x", anchor="c")
+        self.isXLogScaleCheckButton.select()
+
+        self.isYLogScale = tkinter.BooleanVar()
+        self.isYLogScaleCheckButton = tkinter.Checkbutton(self, variable=self.isYLogScale,
+                                                          onvalue=True, offvalue=False,
+                                                          text="y", anchor="c")
+        self.isYLogScaleCheckButton.deselect()
+
+        self.logReportString = tkinter.StringVar()
+        self.logReportLabel = tkinter.Label(self, textvariable=self.logReportString, wraplength=1050,
+                                            anchor="center", justify="center", bg="black",fg="white")
 
         # widget looks in window
         self.paddingYopt = 5
@@ -118,6 +130,7 @@ class PlotPSMCApp(tkinter.Tk):
         buttonSaveRow = 9
         isLogScaleRow = 16
         buttonPlot = 17
+        logReportRow = 18
 
         labelColumns = 0
         entryColumns = 1
@@ -189,19 +202,23 @@ class PlotPSMCApp(tkinter.Tk):
         # is log scale check button
         self.isLogScaleLabel.grid(row=isLogScaleRow, column=labelColumns, pady=self.paddingYopt, padx=self.paddingXopt,
                                   sticky=self.stickTo)
-        self.isLogScaleCheckButton.grid(row=isLogScaleRow, column=entryColumns, pady=self.paddingYopt)
+        self.isXLogScaleCheckButton.grid(row=isLogScaleRow, column=entryColumns, pady=self.paddingYopt, sticky="w")
+        self.isYLogScaleCheckButton.grid(row=isLogScaleRow, column=entryColumns, pady=self.paddingYopt, sticky="e")
+
+        self.logReportLabel.grid(row=logReportRow, column=labelColumns, columnspan=3, pady=self.paddingYopt,
+                                 padx=self.paddingXopt, sticky=tkinter.N + tkinter.S + tkinter.E + tkinter.W)
 
         self.center_window()
 
         photo = ImageTk.PhotoImage(Image.open("blackPlot.png"))
         self.plotInGrid = tkinter.Label(self, image=photo)
         self.plotInGrid.image = photo
-        self.plotInGrid.grid(row=1, column=2, rowspan=100, padx=5, pady=5)
+        self.plotInGrid.grid(row=1, column=2, rowspan=17, padx=5, pady=5)
 
         # on client exit
         self.protocol("WM_DELETE_WINDOW", self.client_exit)
         # client exit with "Escape"
-        self.bind('<Escape>', lambda e: self.quit())
+        self.bind('<Escape>', lambda e: self.client_exit())
         # create window variable to hold plot
         self.figWindow = None
 
@@ -212,14 +229,17 @@ class PlotPSMCApp(tkinter.Tk):
         self.eval('tk::PlaceWindow %s center' % self.winfo_pathname(self.winfo_id()))
 
     def on_button_save(self):
-        self.psmcOptions.append((self.pathToPsmcFileEntry.get(),
-                                 float(self.generationTimeEntry.get()),
-                                 float(self.mutRateEntry.get()),
-                                 float(self.binSizeEntry.get()),
-                                 self.sampleNameEntry.get(),
-                                 self.lineColorEntry.get()
-                                 ))
-        print(self.psmcOptions)
+        if Path(self.pathToPsmcFileEntry.get()).is_file():
+            self.psmcOptions.append((self.pathToPsmcFileEntry.get(),
+                                     float(self.generationTimeEntry.get()),
+                                     float(self.mutRateEntry.get()),
+                                     float(self.binSizeEntry.get()),
+                                     self.sampleNameEntry.get(),
+                                     self.lineColorEntry.get()
+                                     ))
+            self.logReportString.set("Current PSMC entries: \n"+self.psmcOptions.__str__())
+        else:
+            self.logReportString.set("Please provide a valid path to a PSMC file or import a parameter file.")
 
     def on_button_plot_externalWindow(self):
         PlotPSMC.plotPsmc(self.psmcOptions, yAsEffectiveSize=True,
@@ -241,30 +261,36 @@ class PlotPSMCApp(tkinter.Tk):
         imageLabel.grid(sticky=tkinter.NE + tkinter.SW)
 
     def on_button_plot(self):
-        PlotPSMC.plotPsmc(self.psmcOptions, yAsEffectiveSize=True,
-                          xmin=float(self.xminEntry.get()),
-                          xmax=float(self.xmaxEntry.get()),
-                          ymin=float(self.yminEntry.get()),
-                          ymax=float(self.ymaxEntry.get()),
-                          transparency=float(self.transparencyEntry.get()),
-                          savePlotWithName=self.savePlotNameEntry.get(),
-                          isLogScale=self.isLogScale.get())
-        myImage = ImageTk.PhotoImage(Image.open(self.savePlotNameEntry.get() + ".png"))
-        self.plotInGrid.configure(image=myImage)
-        self.plotInGrid.image = myImage
+        if self.psmcOptions:
+            PlotPSMC.plotPsmc(self.psmcOptions, yAsEffectiveSize=True,
+                              xmin=float(self.xminEntry.get()),
+                              xmax=float(self.xmaxEntry.get()),
+                              ymin=float(self.yminEntry.get()),
+                              ymax=float(self.ymaxEntry.get()),
+                              transparency=float(self.transparencyEntry.get()),
+                              isXLogScale=self.isXLogScale.get(),
+                              isYLogScale=self.isYLogScale.get(),
+                              savePlotWithName=self.savePlotNameEntry.get())
+            myImage = ImageTk.PhotoImage(Image.open("./Plots/" + self.savePlotNameEntry.get() + ".png"))
+            self.plotInGrid.configure(image=myImage)
+            self.plotInGrid.image = myImage
+            self.logReportString.set("Plotted image from the following PSMC entries: \n" + self.psmcOptions.__str__() +
+                                     ".\n" + "Saved plot as " + self.savePlotNameEntry.get() + ".png.")
+        else:
+            self.logReportString.set("There are no PSMC entries available, nothing to plot.")
 
     def on_button_clear(self):
         self.psmcOptions = []
+        self.logReportString.set("All PSMC entries have been cleared.")
 
     def on_button_import_from_file(self):
         self.psmcOptions = PlotPSMC.readPsmcOptions(self.pathToParFileEntry.get())
-        print(self.psmcOptions)
+        self.logReportString.set("Current PSMC entries: \n" + self.psmcOptions.__str__())
 
     def client_exit(self):
-        if False:  # Spawn a message box asking if the user wants to quit, unnecessary
-            if messagebox.askyesno("Exit", "Do you want to quit?"):
-                self.quit()
-        self.quit()
+        self.logReportString.set("Bye!?")
+        if messagebox.askyesno("PlotMyPSMC", "Are you sure you want to exit?"):
+            self.quit()
 
     def show_error(self, *args):
         err = traceback.format_exception(*args)

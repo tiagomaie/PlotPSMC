@@ -2,6 +2,8 @@ import matplotlib.pyplot as pplot
 import matplotlib.ticker as mtick
 import re as regex
 from random import random as rnd
+import numpy
+import os
 
 
 class OOMFormatter(mtick.ScalarFormatter):
@@ -71,7 +73,7 @@ def parse_psmc_output(psmcInputList, representAsEffectiveSize):
 def plotPsmc(listOfOpt, yAsEffectiveSize,
              xmin=0, xmax=0,
              ymin=0, ymax=0,
-             transparency=0.1, isLogScale=True,
+             transparency=0.1, isXLogScale=True, isYLogScale=False,
              savePlotWithName="myPlot"):
 
     myFigure = pplot.figure(1)
@@ -98,13 +100,35 @@ def plotPsmc(listOfOpt, yAsEffectiveSize,
 
     sumAxes = xmin+xmax+ymin+ymax
 
+    if isXLogScale:
+        inFigure.set_xscale("log")
+    else:
+        inFigure.set_xscale("linear")
+        xOoMagnitude = numpy.floor(numpy.log10(numpy.abs(xmax)))
+        inFigure.xaxis.set_major_formatter(OOMFormatter(xOoMagnitude, "%1.1f"))
+
+    if isYLogScale:
+        inFigure.set_yscale("log")
+    else:
+        inFigure.set_yscale("linear")
+
     if yAsEffectiveSize:
         pplot.xlabel("Years")
         pplot.ylabel("Effective population size")
         pplot.title("Y axis scaled as $N_e$")
         if sumAxes == 0:
             xmin = 1e3; xmax = 1e7; ymin = 0; ymax = 5e4
-        inFigure.yaxis.set_major_formatter(OOMFormatter(4, "%1.0f"))
+
+        if ymax <= 1e4:
+            inFigure.yaxis.set_major_formatter(OOMFormatter(4, "%1.2f"))
+        elif ymax <= 1e5:
+            inFigure.yaxis.set_major_formatter(OOMFormatter(4, "%1.1f"))
+        elif ymax <= 1e7:
+            inFigure.yaxis.set_major_formatter(OOMFormatter(4, "%1.0f"))
+        elif ymax > 1e7:
+            yOoMagnitude = numpy.floor(numpy.log10(numpy.abs(ymax)))
+            inFigure.yaxis.set_major_formatter(OOMFormatter(yOoMagnitude, "%1.2f"))
+
     else:
         pplot.xlabel(r'Time (scaled in units of 2$\mu$T)')
         pplot.ylabel("Population size\n(scaled in units of $4\mu N_e\ x\ 10^3$)")
@@ -116,12 +140,11 @@ def plotPsmc(listOfOpt, yAsEffectiveSize,
     inFigure.grid(True)
     inFigure.set_xlim(xmin, xmax)
     inFigure.set_ylim(ymin, ymax)
-    if isLogScale:
-        inFigure.set_xscale("log")
-    else:
-        inFigure.set_xscale("linear")
 
-    myFigure.savefig(savePlotWithName)
+    if not os.path.exists("./Plots"):
+        os.mkdir("./Plots/")
+
+    myFigure.savefig("./Plots/"+savePlotWithName)
     myFigure.clf()  # close/clear fig so that it doesnt keep using resources
     # pplot.close(1) # can't actually close figure because of current conflict with tkinter GUI
 
