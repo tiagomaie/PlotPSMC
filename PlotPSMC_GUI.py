@@ -103,7 +103,7 @@ class PlotPSMCApp(tkinter.Tk):
 
         self.logReportString = tkinter.StringVar()
         self.logReportLabel = tkinter.Label(self, textvariable=self.logReportString, wraplength=1050,
-                                            anchor="center", justify="center", bg="black",fg="white")
+                                            anchor="center", justify="center", bg="black", fg="white")
 
         # widget looks in window
         self.paddingYopt = 5
@@ -308,6 +308,6 @@ def main():
 if __name__ == "__main__":
     main()
 
-#myWindow = PlotPSMCApp()
+# myWindow = PlotPSMCApp()
 # draw the window and start the application
-#myWindow.mainloop()
+# myWindow.mainloop()

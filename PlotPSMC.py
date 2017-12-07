@@ -61,8 +61,10 @@ def parse_psmc_output(psmcInputList, representAsEffectiveSize):
                         scaledTime = [generationTime * 2 * n0 * time_k for time_k in timePoints]
                         scaledSize = [n0 * lambda_k for lambda_k in lambdaPoints]
                     else:
-                        scaledTime = [time_k * estimatedTheta / binSize for time_k in timePoints]  # pairwiseSequenceDivergence
-                        scaledSize = [(lambda_k * estimatedTheta / binSize)*1e3 for lambda_k in lambdaPoints]  # scaledMutRate
+                        scaledTime = [time_k * estimatedTheta / binSize for time_k in timePoints]
+                        # pairwiseSequenceDivergence
+                        scaledSize = [(lambda_k * estimatedTheta / binSize)*1e3 for lambda_k in lambdaPoints]
+                        # scaledMutRate
 
                     blockPoints.append((scaledTime, scaledSize))
         allPsmcData.append(blockPoints)
@@ -78,6 +80,8 @@ def plotPsmc(listOfOpt, yAsEffectiveSize,
 
     myFigure = pplot.figure(1)
     inFigure = myFigure.add_subplot(111)
+
+    inFigure.axvline(linewidth=10, alpha=0.25, label="LGM", x=22000, color='black')
 
     myData = parse_psmc_output(listOfOpt, representAsEffectiveSize=yAsEffectiveSize)
 
@@ -180,7 +184,7 @@ def readPsmcOptions(pathToOptionsFile):
     return psmcOptions
 
 # a list of inputs/options to plot the PSMC curve
-#psmc_options = readPsmcOptions("./plotPSMC.csv")
+# psmc_options = readPsmcOptions("./plotPSMC.csv")
 
-#a = plotPsmc(psmc_options, yAsEffectiveSize=True, xmin=1e4, xmax=1e8, ymin=0, ymax=2e5, transparency=0.15)
+# a = plotPsmc(psmc_options, yAsEffectiveSize=True, xmin=1e4, xmax=1e8, ymin=0, ymax=2e5, transparency=0.15)
 # b = plotPsmc(psmc_options, yAsEffectiveSize=False, xmin=1e-7, xmax=1e-2, ymin=0, ymax=5e0)
