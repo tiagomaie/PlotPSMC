@@ -1,12 +1,20 @@
 #PathToPSMCfile GenerationTime MutationRate BinSize SampleName Color(unnecessary but recomended, a random one will be generated)
-#./papio_file_InitUnfilt_Combined_80BSrounds.psmc 11 0.9e-8 100 "P.papio_unfiltered" "cyan"
-#./papio_file_InitFilt_Combined_80BSrounds.psmc 11 0.9e-8 100 "P.papio_filtered" "orange"
-#"./TEST_InitFilt_combineBootstrap1-10.psmc" 11 0.9e-8 100 "P.papio" "red"
-./file_rmdupMOS.bam_BWC_.psmc 10 0.9e-8 100 BWColobus_Tai black
-#./file_test1_combined.psmc 25 2.5e-8 100 Chimpanzee blue
 #./90French10Altai_sorted.psmc 25 2.5e-8 100 French cyan
 #./Dai_upper.psmc 25 2.5e-8 100 Dai
 #./Yoruba_upper.psmc 25 2.5e-8 100 Yoruba purple
 #./Vi33_25_neanderthal.psmc 25 2.5e-8 100 Neanderthal orange
-./file_rc_CB10_combined.psmc 10 0.9e-8 100 RedColobus_CI red
-./file_T29_RC_GB_combined.psmc 10 0.9e-8 100 RedColobus_GB green
+#./papio_file_InitUnfilt_Combined_80BSrounds.psmc 11 0.9e-8 100 "P.papio_unfiltered" "cyan"
+#./papio_file_InitFilt_Combined_80BSrounds.psmc 11 0.9e-8 100 "P.papio_filtered" "orange"
+#"./TEST_InitFilt_combineBootstrap1-10.psmc" 10 0.9e-8 100 "P.papio" "red"
+#./file_test1_combined.psmc 15 1.8e-8 100 Chimpanzee cyan
+#./file_rc_CB10_combined.psmc 7 0.9e-8 100 RC_CI_vsBWC yellow
+#./file_CB10_RC_CI_RefSeq-Mmul_trimReads_combined.psmc 7 0.9e-8 100 RC_CI_vsMm orange
+#./file_CB10_RC_CI_RefSeq-Panu_trimReads_combined.psmc 7 0.9e-8 100 RC_CI_vsPanu red
+#./file_T29_RC_GB_combined.psmc 7 0.9e-8 100 RC_GB_vsBWC blue
+#./file_T29_RC_GB_RefSeq-Mmul_combined.psmc 7 0.9e-8 100 RC_GB_vsMm cyan
+#./file_T29_RC_GB_RefSeq-Panu_trimReads_combined.psmc 7 0.9e-8 100 RC_GB_vsPanu black
+./file_rmdupMOS.bam_BWC_.psmc 7 0.9e-8 100 BWC_CI_vsBWC black
+./file_CP8_BWC_Tai_RefSeq-Mmul_trimReads_combined.psmc 7 0.9e-8 100 BWC_CI_vsMm red
+./file_T31_bwc_gb_combined.psmc 7 0.9e-8 100 BWC_GB_vsBWC blue
+./file_T31_BWC_GB_RefSeq-Mmul_trimReads_combined.psmc 7 0.9e-8 100 BWC_GB_vsMm cyan
+./file_T31BWCGB-refseqPanu_trimReads_combined.psmc 7 0.9e-8 100 BWC_GB_vsPanu orange
