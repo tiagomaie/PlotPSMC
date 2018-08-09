@@ -81,8 +81,14 @@ def plotPsmc(listOfOpt, yAsEffectiveSize,
     myFigure = pplot.figure(1)
     inFigure = myFigure.add_subplot(111)
 
+    # Show Last Glacial Maximum?
     if showLGM:
-        inFigure.axvline(linewidth=10, alpha=0.25, label="LGM", x=22000, color='black')
+        inFigure.axvline(
+            linewidth=10,
+            alpha=0.25,
+            label=None,  # label="LGM",
+            x=22000,
+            color='black')
 
     myData = parse_psmc_output(listOfOpt, representAsEffectiveSize=yAsEffectiveSize)
 
