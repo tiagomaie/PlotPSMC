@@ -75,13 +75,14 @@ def parse_psmc_output(psmcInputList, representAsEffectiveSize):
 def plotPsmc(listOfOpt, yAsEffectiveSize,
              xmin=0, xmax=0,
              ymin=0, ymax=0,
-             transparency=0.1, isXLogScale=True, isYLogScale=False,
+             transparency=0.1, isXLogScale=True, isYLogScale=False, showLGM=False,
              savePlotWithName="myPlot"):
 
     myFigure = pplot.figure(1)
     inFigure = myFigure.add_subplot(111)
 
-    inFigure.axvline(linewidth=10, alpha=0.25, label="LGM", x=22000, color='black')
+    if showLGM:
+        inFigure.axvline(linewidth=10, alpha=0.25, label="LGM", x=22000, color='black')
 
     myData = parse_psmc_output(listOfOpt, representAsEffectiveSize=yAsEffectiveSize)
 

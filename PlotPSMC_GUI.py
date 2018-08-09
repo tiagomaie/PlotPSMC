@@ -25,7 +25,7 @@ class PlotPSMCApp(tkinter.Tk):
                                                    "parameter file (blue) or input your own psmc files, "
                                                    "as well as the necessary options (orange) into this interface, "
                                                    "you always need to specify your plotting options (green).",
-                                              wraplength=650, anchor="center", justify="center", bg="gray80")
+                                              wraplength=650, anchor="center", justify="center", bg="gray40")
 
         importFromFileColor = "SteelBlue1"
         importPSMCFileColor = "goldenrod"
@@ -34,52 +34,58 @@ class PlotPSMCApp(tkinter.Tk):
 
         self.pathToParFileLabel = tkinter.Label(self, text="Path to parameter file", bg=importFromFileColor)
         self.pathToParFileEntry = tkinter.Entry(self, width=entryBoxWidth)
+        self.add_placeholder_to(self.pathToParFileEntry, "")
         self.importFromFileButton = tkinter.Button(self, text="Import from parameter file",
                                                    command=self.on_button_import_from_file,
                                                    bg=importFromFileColor)
 
         self.pathToPsmcFileLabel = tkinter.Label(self, text="Path to PSMC file", bg=importPSMCFileColor)
         self.pathToPsmcFileEntry = tkinter.Entry(self, width=entryBoxWidth)
+        self.add_placeholder_to(self.pathToPsmcFileEntry, "")
 
         self.generationTimeLabel = tkinter.Label(self, text="Generation time", bg=importPSMCFileColor)
         self.generationTimeEntry = tkinter.Entry(self, width=entryBoxWidth)
-        self.generationTimeEntry.insert(0, "25")
+        self.add_placeholder_to(self.generationTimeEntry, "25")
 
         self.mutRateLabel = tkinter.Label(self, text="Mutation rate", bg=importPSMCFileColor)
         self.mutRateEntry = tkinter.Entry(self, width=entryBoxWidth)
-        self.mutRateEntry.insert(0, "2.5e-8")
+        self.add_placeholder_to(self.mutRateEntry, "2.5e-8")
 
         self.binSizeLabel = tkinter.Label(self, text="Bin size", bg=importPSMCFileColor)
         self.binSizeEntry = tkinter.Entry(self, width=entryBoxWidth)
-        self.binSizeEntry.insert(0, "100")
+        self.add_placeholder_to(self.binSizeEntry, "100")
 
         self.sampleNameLabel = tkinter.Label(self, text="Sample name", bg=importPSMCFileColor)
         self.sampleNameEntry = tkinter.Entry(self, width=entryBoxWidth)
-        self.sampleNameEntry.insert(0, "my_sample")
+        self.add_placeholder_to(self.sampleNameEntry, "my_sample")
 
         self.lineColorLabel = tkinter.Label(self, text="Line color", bg=importPSMCFileColor)
         self.lineColorEntry = tkinter.Entry(self, width=entryBoxWidth)
-        self.lineColorEntry.insert(0, "red")
+        self.add_placeholder_to(self.lineColorEntry, "red")
 
         self.xminLabel = tkinter.Label(self, text="X axis minimum value", bg=plottingOptionsColor)
         self.xminEntry = tkinter.Entry(self, width=entryBoxWidth)
-        self.xminEntry.insert(0, "1e3")
+        self.add_placeholder_to(self.xminEntry, "1e3")
+
         self.xmaxLabel = tkinter.Label(self, text="X axis maximum value", bg=plottingOptionsColor)
         self.xmaxEntry = tkinter.Entry(self, width=entryBoxWidth)
-        self.xmaxEntry.insert(0, "1e7")
+        self.add_placeholder_to(self.xmaxEntry, "1e7")
+
         self.yminLabel = tkinter.Label(self, text="Y axis minimum value", bg=plottingOptionsColor)
         self.yminEntry = tkinter.Entry(self, width=entryBoxWidth)
-        self.yminEntry.insert(0, "0")
+        self.add_placeholder_to(self.yminEntry, "0")
+
         self.ymaxLabel = tkinter.Label(self, text="Y axis maximum value", bg=plottingOptionsColor)
         self.ymaxEntry = tkinter.Entry(self, width=entryBoxWidth)
-        self.ymaxEntry.insert(0, "1e6")
+        self.add_placeholder_to(self.ymaxEntry, "1e6")
+
         self.transparencyLabel = tkinter.Label(self, text="Bootstrap transparency", bg=plottingOptionsColor)
         self.transparencyEntry = tkinter.Entry(self, width=entryBoxWidth)
-        self.transparencyEntry.insert(0, "0.15")
+        self.add_placeholder_to(self.transparencyEntry, "0.15")
 
         self.savePlotNameLabel = tkinter.Label(self, text="Plot Name", bg=plottingOptionsColor)
         self.savePlotNameEntry = tkinter.Entry(self, width=entryBoxWidth)
-        self.savePlotNameEntry.insert(0, "my_PSMC_plot")
+        self.add_placeholder_to(self.savePlotNameEntry, "my_PSMC_plot")
 
         self.saveButton = tkinter.Button(self, text="Save options",
                                          command=self.on_button_save, bg=importPSMCFileColor)
@@ -148,6 +154,7 @@ class PlotPSMCApp(tkinter.Tk):
         self.pathToPsmcFileLabel.grid(row=pathPSMCFileRow, column=labelColumns, pady=self.paddingYopt,
                                       padx=self.paddingXopt, sticky=self.stickTo)
         self.pathToPsmcFileEntry.grid(row=pathPSMCFileRow, column=entryColumns)
+
         #  generation time
         self.generationTimeLabel.grid(row=generationRow, column=labelColumns, pady=self.paddingYopt,
                                       padx=self.paddingXopt, sticky=self.stickTo)
@@ -210,7 +217,7 @@ class PlotPSMCApp(tkinter.Tk):
 
         self.center_window()
 
-        photo = ImageTk.PhotoImage(Image.open("blackPlot.png"))
+        photo = ImageTk.PhotoImage(Image.open("blankPlot.png"))
         self.plotInGrid = tkinter.Label(self, image=photo)
         self.plotInGrid.image = photo
         self.plotInGrid.grid(row=1, column=2, rowspan=17, padx=5, pady=5)
@@ -270,6 +277,7 @@ class PlotPSMCApp(tkinter.Tk):
                               transparency=float(self.transparencyEntry.get()),
                               isXLogScale=self.isXLogScale.get(),
                               isYLogScale=self.isYLogScale.get(),
+                              showLGM=False,
                               savePlotWithName=self.savePlotNameEntry.get())
             myImage = ImageTk.PhotoImage(Image.open("./Plots/" + self.savePlotNameEntry.get() + ".png"))
             self.plotInGrid.configure(image=myImage)
@@ -283,9 +291,44 @@ class PlotPSMCApp(tkinter.Tk):
         self.psmcOptions = []
         self.logReportString.set("All PSMC entries have been cleared.")
 
+        self.pathToPsmcFileEntry.delete(0, "end")
+        self.generationTimeEntry.delete(0, "end")
+        self.mutRateEntry.delete(0, "end")
+        self.binSizeEntry.delete(0, "end")
+        self.sampleNameEntry.delete(0, "end")
+        self.lineColorEntry.delete(0, "end")
+        self.add_placeholder_to(self.pathToPsmcFileEntry, "")
+        self.add_placeholder_to(self.generationTimeEntry, "25")
+        self.add_placeholder_to(self.mutRateEntry, "2.5e-8")
+        self.add_placeholder_to(self.binSizeEntry, "100")
+        self.add_placeholder_to(self.sampleNameEntry, "my_sample")
+        self.add_placeholder_to(self.lineColorEntry, "red")
+
     def on_button_import_from_file(self):
         self.psmcOptions = PlotPSMC.readPsmcOptions(self.pathToParFileEntry.get())
         self.logReportString.set("Current PSMC entries: \n" + self.psmcOptions.__str__())
+
+    def add_placeholder_to(self, entry, placeholder):
+
+        entry.insert(0, placeholder)
+        entry.config(fg='grey', bg="white")
+
+        def on_entry_click(event, this_entry=entry):
+            """function that gets called whenever entry is clicked"""
+            #print(event.widget.grid_info())
+
+            if this_entry.cget("fg") == 'grey':
+                this_entry.delete(0, "end")  # delete all the text in the entry
+                this_entry.insert(0, '')  # Insert blank for user input
+                this_entry.config(fg='black', bg="white")
+
+        def on_focusout(event, this_entry=entry, placeholder=placeholder):
+            if this_entry.get() == '':
+                this_entry.insert(0, placeholder)
+                this_entry.config(fg='grey', bg="white")
+
+        entry.bind('<FocusIn>', on_entry_click, add="+")
+        entry.bind('<FocusOut>', on_focusout, add="+")
 
     def client_exit(self):
         self.logReportString.set("Bye!?")
@@ -302,11 +345,14 @@ class PlotPSMCApp(tkinter.Tk):
 def main():
     myWindow = PlotPSMCApp()
     # draw the window and start the application
+    myWindow.configure(background="grey80")
+    myWindow.resizable(0, 0)
     myWindow.mainloop()
 
 
 if __name__ == "__main__":
     main()
+
 
 # myWindow = PlotPSMCApp()
 # draw the window and start the application
